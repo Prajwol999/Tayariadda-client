@@ -1,11 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, Target, TrendingUp, Bell, ArrowRight, Star, CheckCircle, GraduationCap } from "lucide-react";
-import { useContext, useEffect } from "react";
+import { BookOpen, Target, TrendingUp, Bell, ArrowRight, Star, CheckCircle, GraduationCap, Plus, Minus } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
+import { motion, AnimatePresence } from "framer-motion";
 
 function LandingPage() {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [openFaq, setOpenFaq] = useState(null);
+
 
     useEffect(() => {
         if (auth?.authenticate) {
@@ -90,6 +93,30 @@ function LandingPage() {
             avatar: "BT"
         }
     ];
+
+    const faqs = [
+        {
+            question: "What courses does Tayari Adda offer?",
+            answer: "We offer a wide range of courses for Loksewa preparation, including Level 4 and 5 officer courses, Kharidar, Nayab Subba, and specialized language classes. Each course is designed by experts to help you succeed."
+        },
+        {
+            question: "How can I access the study materials?",
+            answer: "Once you enroll in a course, you get instant access to all study materials including video lectures, PDF notes, and mock tests through your student dashboard."
+        },
+        {
+            question: "Can I watch the videos offline?",
+            answer: "Currently, our video lectures require an internet connection. However, we have optimized them for low banking usage so you can learn smoothly even with moderate internet speeds."
+        },
+        {
+            question: "Do you provide mock tests?",
+            answer: "Yes! We have an extensive collection of mock tests that simulate the real exam environment. You get detailed performance analysis after each test."
+        },
+        {
+            question: "Is there a refund policy?",
+            answer: "Yes, we offer a 7-day money-back guarantee if you are not satisfied with our course content. No questions asked."
+        }
+    ];
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -260,6 +287,51 @@ function LandingPage() {
                                         <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                                     ))}
                                 </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ Section */}
+            <section className="py-20 bg-gray-50">
+                <div className="max-w-3xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+                        <p className="text-xl text-gray-600">Find answers to common questions about our platform</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        {faqs.map((faq, index) => (
+                            <div
+                                key={index}
+                                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                            >
+                                <button
+                                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                                >
+                                    <span className="font-semibold text-gray-900 text-lg">{faq.question}</span>
+                                    {openFaq === index ? (
+                                        <Minus className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                                    ) : (
+                                        <Plus className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                    )}
+                                </button>
+                                <AnimatePresence>
+                                    {openFaq === index && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: "auto", opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                        >
+                                            <div className="px-6 pb-6 text-gray-600 leading-relaxed">
+                                                {faq.answer}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         ))}
                     </div>

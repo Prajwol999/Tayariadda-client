@@ -19,7 +19,7 @@ function CommonForm({
         setFormData={setFormData}
       />
       {children}
-      <Button disabled={isButtonDisabled} type="submit" className="mt-5 w-full">
+      <Button disabled={isButtonDisabled} type="submit" className="mt-5 w-full bg-blue-600 hover:bg-blue-700">
         {buttonText || "Submit"}
       </Button>
     </form>
