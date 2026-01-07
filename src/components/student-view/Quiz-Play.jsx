@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "@/api/axiosInstance";
 import { fetchStudentQuizByIdService } from "@/services";
@@ -29,6 +30,7 @@ const QuizPlay = () => {
   const [timeLeft, setTimeLeft] = useState(900); // 15 minutes
   const [timerRunning, setTimerRunning] = useState(true);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
 
   // Seed questions data
   const seedQuestions = {
@@ -245,11 +247,22 @@ const QuizPlay = () => {
 
         {!showResults && (
           <div className="flex items-center gap-6">
-            <div className="text-lg font-mono font-bold text-gray-700">
-              Time Left: <span className={timeLeft < 60 ? "text-red-600" : "text-blue-600"}>
-                {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
-              </span>
-            </div>
+            {!focusMode && (
+              <div className="text-lg font-mono font-bold text-gray-700">
+                Time Left: <span className={timeLeft < 60 ? "text-red-600" : "text-blue-600"}>
+                  {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+                </span>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFocusMode(!focusMode)}
+              className="flex items-center gap-2"
+            >
+              {focusMode ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {focusMode ? "Exit Focus" : "Focus Mode"}
+            </Button>
             <Button
               variant="destructive"
               size="sm"
@@ -451,7 +464,7 @@ const QuizPlay = () => {
         </div>
 
         {/* Sidebar - Question Grid & Info */}
-        {!showResults && (
+        {!showResults && !focusMode && (
           <div className="w-full md:w-80 flex-shrink-0">
             <div className="bg-white shadow-md rounded-xl p-6 sticky top-24">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Question Navigator</h3>
