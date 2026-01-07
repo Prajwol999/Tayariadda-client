@@ -3,6 +3,9 @@ import { BookOpen, Target, TrendingUp, Bell, ArrowRight, Star, CheckCircle, Grad
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
 import { motion, AnimatePresence } from "framer-motion";
+import avatarRajesh from "@/assets/avatar-rajesh.png";
+import avatarSita from "@/assets/avatar-sita.png";
+import avatarBikash from "@/assets/avatar-bikash.png";
 
 function LandingPage() {
     const { auth } = useContext(AuthContext);
@@ -78,21 +81,22 @@ function LandingPage() {
             name: "Rajesh Sharma",
             role: "Level 5 Officer",
             message: "Tayari Adda helped me crack the Loksewa exam on my first attempt. The mock tests were incredibly helpful and gave me real exam experience.",
-            avatar: "RS"
+            avatar: avatarRajesh
         },
         {
             name: "Sita Adhikari",
             role: "Section Officer",
             message: "The video lectures are so clear and well-structured. I could study at my own pace and the progress tracking kept me motivated throughout my preparation.",
-            avatar: "SA"
+            avatar: avatarSita
         },
         {
             name: "Bikash Thapa",
             role: "Administrative Officer",
             message: "Best platform for Loksewa preparation! The daily updates and comprehensive study materials made all the difference in my exam success.",
-            avatar: "BT"
+            avatar: avatarBikash
         }
     ];
+
 
     const faqs = [
         {
@@ -171,7 +175,7 @@ function LandingPage() {
                             </p>
                             <div className="flex gap-4">
                                 <Link
-                                    to="/courses"
+                                    to="/auth"
                                     className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-lg transition-colors flex items-center gap-2"
                                 >
                                     Get Started
@@ -260,7 +264,6 @@ function LandingPage() {
                     </div>
                 </div>
             </section>
-
             {/* Success Stories */}
             <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-6">
@@ -273,8 +276,12 @@ function LandingPage() {
                         {testimonials.map((testimonial, index) => (
                             <div key={index} className="bg-gray-50 rounded-2xl p-8 space-y-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                        {testimonial.avatar}
+                                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                                        <img
+                                            src={testimonial.avatar}
+                                            alt={testimonial.name}
+                                            className="w-full h-full object-cover"
+                                        />
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
@@ -384,7 +391,7 @@ function LandingPage() {
                     </div>
                 </div>
             </footer>
-        </div>
+        </div >
     );
 }
 
