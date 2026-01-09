@@ -128,9 +128,10 @@ export async function fetchStudentViewCourseListService(query) {
   return data;
 }
 
-export async function fetchStudentViewCourseDetailsService(courseId) {
+export async function fetchStudentViewCourseDetailsService(courseId, abortSignal) {
   const { data } = await axiosInstance.get(
-    `/student/course/get/details/${courseId}`
+    `/student/course/get/details/${courseId}`,
+    abortSignal ? { signal: abortSignal } : {}
   );
 
   return data;

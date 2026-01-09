@@ -19,7 +19,8 @@ import {
   createEsewaPaymentService
 } from "@/services";
 import EsewaPaymentForm from "@/components/student-view/EsewaPaymentForm";
-import { CheckCircle, Globe, Lock, PlayCircle, Users, Calendar, Award, Clock, Wallet } from "lucide-react";
+import CourseDetailsSkeleton from "@/components/student-view/CourseDetailsSkeleton";
+import { CheckCircle, Globe, Lock, PlayCircle, Users, Calendar, Award, Clock, Wallet, AlertCircle } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "@/api/axiosInstance";
@@ -45,21 +46,39 @@ function StudentViewCourseDetailsPage() {
   const [approvalUrl, setApprovalUrl] = useState("");
   const [esewaConfig, setEsewaConfig] = useState(null);
   const [isPurchased, setIsPurchased] = useState(false);
+  const [error, setError] = useState(null);
   const { id } = useParams();
   const location = useLocation();
 
-  async function fetchStudentViewCourseDetails() {
-    const response = await fetchStudentViewCourseDetailsService(
-      currentCourseDetailsId
-    );
+  async function fetchStudentViewCourseDetails(abortSignal) {
+    try {
+      setError(null); // Clear any previous errors
+      const response = await fetchStudentViewCourseDetailsService(
+        currentCourseDetailsId,
+        abortSignal
+      );
 
-    if (response?.success) {
-      setStudentViewCourseDetails(response?.data);
-      setLoadingState(false);
-    } else {
-      setStudentViewCourseDetails(null);
-      setLoadingState(false);
+      if (response?.success) {
+        setStudentViewCourseDetails(response?.data);
+        setLoadingState(false);
+      } else {
+        setStudentViewCourseDetails(null);
+        setLoadingState(false);
+        setError("Failed to load course details. Please try again.");
+      }
+    } catch (err) {
+      // Don't set error if request was aborted
+      if (err.name !== 'AbortError') {
+        setLoadingState(false);
+        setError("An error occurred while loading the course. Please check your connection and try again.");
+      }
     }
+  }
+
+  function handleRetry() {
+    setError(null);
+    setLoadingState(true);
+    fetchStudentViewCourseDetails();
   }
 
   async function checkCoursePurchaseInfo() {
@@ -141,7 +160,17 @@ function StudentViewCourseDetailsPage() {
   }, [displayCurrentVideoFreePreview]);
 
   useEffect(() => {
-    if (currentCourseDetailsId !== null) fetchStudentViewCourseDetails();
+    if (currentCourseDetailsId !== null) {
+      // Create AbortController for this request
+      const abortController = new AbortController();
+
+      fetchStudentViewCourseDetails(abortController.signal);
+
+      // Cleanup function to abort request if component unmounts or dependency changes
+      return () => {
+        abortController.abort();
+      };
+    }
   }, [currentCourseDetailsId]);
 
   useEffect(() => {
@@ -155,11 +184,43 @@ function StudentViewCourseDetailsPage() {
     }
   }, [location.pathname]);
 
-  if (loadingState) return <div className="p-10 container mx-auto"><Skeleton className="h-[400px] w-full rounded-xl" /></div>;
+  if (loadingState) return <CourseDetailsSkeleton />;
 
   if (approvalUrl !== "") {
     window.location.href = approvalUrl;
     return null;
+  }
+
+  // Error State
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" role="alert" aria-live="assertive">
+        <div className="bg-white rounded-2xl shadow-lg border border-red-200 p-8 max-w-md w-full text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 rounded-full bg-red-100">
+              <AlertCircle className="w-12 h-12 text-red-600" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Oops! Something went wrong</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="space-y-3">
+            <Button
+              onClick={handleRetry}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all shadow-md hover:shadow-lg"
+            >
+              Try Again
+            </Button>
+            <Button
+              onClick={() => navigate("/student/courses")}
+              variant="outline"
+              className="w-full font-semibold py-3 rounded-lg"
+            >
+              Back to Courses
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const getIndexOfFreePreviewUrl =

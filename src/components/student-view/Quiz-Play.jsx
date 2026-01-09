@@ -325,7 +325,9 @@ const QuizPlay = () => {
                 </Button>
 
                 <Button
-                  className="px-8 bg-blue-600 hover:bg-blue-700 text-white"
+                  className={`px-8 ${currentIndex + 1 === questions.length
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"}`}
                   onClick={handleNextQuestion}
                 >
                   {currentIndex + 1 === questions.length ? "Finish Quiz" : "Next Question"}

@@ -1,4 +1,4 @@
-import { GraduationCap, TvMinimalPlay, Sun, Moon, ClipboardList, Menu, User, LogOut, Settings } from "lucide-react";
+import { GraduationCap, TvMinimalPlay, Sun, Moon, ClipboardList, Menu, User, LogOut, Settings, Bell, Loader2 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useContext, useState } from "react";
@@ -29,6 +29,23 @@ function StudentViewCommonHeader() {
   const { resetCredentials, auth } = useContext(AuthContext); // Added auth to access user name for avatar fallback
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, message: "New course available: Advanced GK", time: "2 hours ago", read: false },
+    { id: 2, message: "Mock Test results are out!", time: "1 day ago", read: false },
+    { id: 3, message: "Welcome to Tayari Adda!", time: "2 days ago", read: true }
+  ]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  function handleCoursesClick() {
+    setIsLoadingCourses(true);
+    // Simulate a brief loading period before navigation
+    setTimeout(() => {
+      navigate("/student/courses");
+      setIsLoadingCourses(false);
+    }, 500); // 500ms loading animation
+  }
 
   function handleLogout() {
     resetCredentials();
@@ -68,13 +85,21 @@ function StudentViewCommonHeader() {
           </Button>
           <Button
             variant="ghost"
-            onClick={() => navigate("/student/courses")}
-            className={`text-base font-medium ${isActive("/student/courses")
+            onClick={handleCoursesClick}
+            disabled={isLoadingCourses}
+            className={`text-base font-medium flex items-center gap-2 ${isActive("/student/courses")
               ? "text-blue-600 border-b-2 border-blue-600"
               : "text-gray-700 hover:text-blue-600"
               }`}
           >
-            Courses
+            {isLoadingCourses ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              "Courses"
+            )}
           </Button>
           <Button
             variant="ghost"
@@ -100,6 +125,44 @@ function StudentViewCommonHeader() {
 
         {/* User Actions */}
         <div className="flex items-center space-x-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative text-gray-700 hover:text-blue-600">
+                <Bell className="w-6 h-6" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white"></span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 p-0">
+              <DropdownMenuLabel className="p-4 font-semibold border-b">Notifications</DropdownMenuLabel>
+              <div className="max-h-[300px] overflow-auto">
+                {notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`p-4 border-b hover:bg-gray-50 flex flex-col gap-1 cursor-pointer transition-colors ${!notification.read ? "bg-blue-50/50" : ""}`}
+                    >
+                      <p className={`text-sm ${!notification.read ? "font-semibold text-gray-900" : "text-gray-600"}`}>
+                        {notification.message}
+                      </p>
+                      <span className="text-xs text-gray-400">{notification.time}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-gray-500 text-sm">
+                    No new notifications
+                  </div>
+                )}
+              </div>
+              <div className="p-2 border-t text-center">
+                <Button variant="link" size="sm" className="text-blue-600 w-full">
+                  Mark all as read
+                </Button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className="cursor-pointer border-2 border-transparent hover:border-blue-500 transition-all w-10 h-10">
@@ -144,8 +207,15 @@ function StudentViewCommonHeader() {
             <Button variant="ghost" onClick={() => navigate("/student/home")} className="text-base font-medium text-gray-700 hover:text-blue-600 justify-start">
               Home
             </Button>
-            <Button variant="ghost" onClick={() => navigate("/student/courses")} className="text-base font-medium text-gray-700 hover:text-blue-600 justify-start">
-              Courses
+            <Button variant="ghost" onClick={handleCoursesClick} disabled={isLoadingCourses} className="text-base font-medium text-gray-700 hover:text-blue-600 justify-start flex items-center gap-2">
+              {isLoadingCourses ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Courses"
+              )}
             </Button>
             <Button variant="ghost" onClick={() => navigate("/student/quiz")} className="text-base font-medium text-gray-700 hover:text-blue-600 justify-start">
               MCQ

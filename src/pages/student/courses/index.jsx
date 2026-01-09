@@ -17,7 +17,7 @@ import {
   checkCoursePurchaseInfoService,
   fetchStudentViewCourseListService,
 } from "@/services";
-import { ArrowUpDownIcon } from "lucide-react";
+import { ArrowUpDownIcon, Loader2 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -39,6 +39,7 @@ function StudentViewCoursesPage() {
   const [sort, setSort] = useState("price-lowtohigh");
   const [filters, setFilters] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
+  const [loadingCourseId, setLoadingCourseId] = useState(null);
   const {
     studentViewCoursesList,
     setStudentViewCoursesList,
@@ -88,17 +89,25 @@ function StudentViewCoursesPage() {
   }
 
   async function handleCourseNavigate(getCurrentCourseId) {
-    const response = await checkCoursePurchaseInfoService(
-      getCurrentCourseId,
-      auth?.user?._id
-    );
+    // Set loading state immediately for visual feedback
+    setLoadingCourseId(getCurrentCourseId);
 
-    if (response?.success) {
-      if (response?.data) {
-        navigate(`/student/course-progress/${getCurrentCourseId}`);
-      } else {
-        navigate(`/student/course/details/${getCurrentCourseId}`);
+    try {
+      const response = await checkCoursePurchaseInfoService(
+        getCurrentCourseId,
+        auth?.user?._id
+      );
+
+      if (response?.success) {
+        if (response?.data) {
+          navigate(`/student/course-progress/${getCurrentCourseId}`);
+        } else {
+          navigate(`/student/course/details/${getCurrentCourseId}`);
+        }
       }
+    } finally {
+      // Clear loading state after navigation
+      setLoadingCourseId(null);
     }
   }
 
@@ -204,9 +213,21 @@ function StudentViewCoursesPage() {
               studentViewCoursesList.map((courseItem) => (
                 <Card
                   onClick={() => handleCourseNavigate(courseItem?._id)}
-                  className="cursor-pointer transition-transform transform hover:scale-[1.02] border border-gray-300 rounded-lg shadow-md bg-white overflow-hidden hover:shadow-lg"
+                  className="cursor-pointer transition-transform transform hover:scale-[1.02] border border-gray-300 rounded-lg shadow-md bg-white overflow-hidden hover:shadow-lg relative"
                   key={courseItem?._id}
+                  aria-busy={loadingCourseId === courseItem?._id}
                 >
+                  {/* Loading Overlay */}
+                  {loadingCourseId === courseItem?._id && (
+                    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                        <span className="text-sm font-semibold text-gray-700">Loading course...</span>
+                        <span className="sr-only">Loading course details</span>
+                      </div>
+                    </div>
+                  )}
+
                   <CardContent className="flex gap-6 p-6 bg-gray-50">
                     {/* Course Image */}
                     <div className="w-48 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-gray-300">
