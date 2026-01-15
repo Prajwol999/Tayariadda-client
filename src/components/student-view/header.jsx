@@ -1,4 +1,4 @@
-import { GraduationCap, TvMinimalPlay, Sun, Moon, ClipboardList, Menu, User, LogOut, Settings, Bell, Loader2 } from "lucide-react";
+import { GraduationCap, TvMinimalPlay, Sun, Moon, ClipboardList, Menu, User, LogOut, Settings, Bell, Loader2, ChevronDown } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useContext, useState } from "react";
@@ -165,16 +165,19 @@ function StudentViewCommonHeader() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="cursor-pointer border-2 border-transparent hover:border-blue-500 transition-all w-10 h-10">
-                <AvatarImage
-                  src={auth?.user?.image || "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/220px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg"}
-                  alt="User"
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-black text-white font-bold">
-                  {auth?.user?.userName?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
+              <Button variant="ghost" className="flex items-center gap-2 hover:bg-gray-100 rounded-full px-2 py-1">
+                <Avatar className="cursor-pointer border-2 border-transparent hover:border-blue-500 transition-all w-10 h-10">
+                  <AvatarImage
+                    src={auth?.user?.image || "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/220px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg"}
+                    alt="User"
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-black text-white font-bold">
+                    {auth?.user?.userName?.[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <ChevronDown className="w-4 h-4 text-gray-600" />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 mt-2">
               <DropdownMenuLabel className="font-normal">
